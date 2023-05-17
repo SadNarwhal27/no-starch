@@ -2,6 +2,7 @@ import sys, pygame
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 class AlienInvasion:
     """Overall class to manage game assets and behavior."""
@@ -17,15 +18,17 @@ class AlienInvasion:
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
-        self.bg_color = (230,230,230)
+        self.aliens = pygame.sprite.Group()
+
+        self._create_fleet()
 
     def run_game(self):
         """Start the main loop of the game"""
         while True:
-            # Watch for keyboard and mouse events.
             self._check_events()
             self.ship.update()
             self._update_bullets()
+            self._update_aliens()
             self._update_screen()
             self.clock.tick(60)
     
@@ -41,21 +44,21 @@ class AlienInvasion:
 
     def _check_keydown_events(self, event):
         """Respond to keypresses"""
-        if event.key == pygame.K_RIGHT:
+        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             self.ship.moving_right = True
-        elif event.key == pygame.K_LEFT:
+        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
             self.ship.moving_left = True
+        elif event.key == pygame.K_q:
+            sys.exit()
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
 
     def _check_keyup_events(self, event):
         """Respond to key releases"""
-        if event.key == pygame.K_RIGHT:
+        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             self.ship.moving_right = False
-        elif event.key == pygame.K_LEFT:
+        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
             self.ship.moving_left = False
-        elif event.key == pygame.K_q:
-            sys.exit()
 
     def _fire_bullet(self):
         """Create a new bullet and add it to the bullets group."""
@@ -72,6 +75,52 @@ class AlienInvasion:
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
+
+        # Check for any bullets that have hit aliens and removes them.
+        collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+    
+    def _update_aliens(self):
+        """Checks fleet edges, then updates positions."""
+        self._check_fleet_edges()
+        self.aliens.update()
+    
+    def _create_fleet(self):
+        """Create the fleet of aliens."""
+        # Create an alien and keep adding aliens until there's no room left.
+        # Spacing between aliens is one alien width and one alien height.
+        alien = Alien(self)
+        alien_width, alien_height = alien.rect.size
+
+        current_x, current_y = alien_width, alien_height
+        while current_y < (self.settings.screen_height - 3 * alien_height):
+            while current_x < (self.settings.screen_width - 2 * alien_width):
+                self._create_alien(current_x, current_y)
+                current_x += 2 * alien_width
+
+            # Finished a row; reset x value, and increment y value.
+            current_x = alien_width
+            current_y += 2 * alien_height
+
+    def _create_alien(self, x_position, y_position):
+        """Create an alien and place it in the fleet"""
+        new_alien = Alien(self)
+        new_alien.x = x_position
+        new_alien.rect.x = x_position
+        new_alien.rect.y = y_position
+        self.aliens.add(new_alien)
+
+    def _check_fleet_edges(self):
+        """Respond appropriately if any aliens have reached an edge."""
+        for alien in self.aliens.sprites():
+            if alien.check_edges():
+                self._change_fleet_direction()
+                break
+    
+    def _change_fleet_direction(self):
+        """Drop the entire fleet and change the fleet's direction."""
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1
     
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen."""
@@ -81,6 +130,7 @@ class AlienInvasion:
             bullet.draw_bullet()
 
         self.ship.blitme()
+        self.aliens.draw(self.screen)
         
         pygame.display.flip()
 
