@@ -1,0 +1,35 @@
+When creating a django project make sure to do the following steps:
+
+1. Create a local environment for all the packages to be downloaded to
+    ex. python -m venv env
+
+2. Activate the environment in the terminal whenever you work on the project
+    env\Scripts\activate
+
+3. Install Django using a pip install
+
+4. Create a project in Django
+    django-admin startproject PROJECT_NAME .
+        Make sure to include that period so it is configured correctly.
+
+5. Create the Database
+    python manage.py migrate
+
+6. View the project
+    python manage.py runserver
+
+7. Start an App
+    python manage.py startapp APP_NAME
+        A project is organized as a group of individual apps that work together as a whole.
+
+8. Defining Models
+    A model tells Django how to work with the data that will stored in the app.
+    Add a new model in the models.py script by creating a class and storing all code within
+    Make sure to add new models at the top of the INSTALLED_APPS list in settings.py
+
+9. Update Database
+    It's best to do this every time you make a new method
+        Modify the database
+            python manage.py makemigrations APP_NAME
+        Migrate the database
+            python manage.py migrate
