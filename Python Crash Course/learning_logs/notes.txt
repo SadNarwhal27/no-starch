@@ -33,3 +33,15 @@ When creating a django project make sure to do the following steps:
             python manage.py makemigrations APP_NAME
         Migrate the database
             python manage.py migrate
+
+10. Setting Up a Superuser
+    python manage.py createsuperuser
+        Grants access to everything within the app
+
+
+NOTES
+- To view the project
+    python manage.py runserver
+
+- To enter the Django shell
+    python manage.py shell
