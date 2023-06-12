@@ -39,9 +39,84 @@ When creating a django project make sure to do the following steps:
         Grants access to everything within the app
 
 
-NOTES
+DJANGO NOTES
 - To view the project
     python manage.py runserver
 
 - To enter the Django shell
     python manage.py shell
+
+
+HEROKU
+
+CONFIGURING THE FILES FOR DEPLOYMENT
+1. Create a Procfile in your working directory
+
+2. Install Gunicorn and django-on-heroku
+    pip install gunicorn (Python WSGI server needed for web apps)
+    pip install django-on-heroku (Automatically configures Django to work with Heroku)
+
+3. Configure Procfile with gunicorn setup
+    web: gunicorn <myproject>.wsgi
+        <myproject> is the folder the settings.py file is located
+
+4. Install Whitenoise and update settings.py
+    pip install whitenoise
+    Under Middleware, add:
+        'whitenoise.middleware.WhiteNoiseMiddleware',
+
+5. Create a requirements.txt file
+    pip freeze > requirements.txt
+
+6. Create a runtime.txt file (optional)
+    python-3.x.x
+
+7. Add django_on_heroku and dj_database_url to the settings.py file
+    import django_on_heroku and dj_database_url
+
+    <--- bottom of file --->
+    django_on_heroku.settings(locals())
+
+8. Take any important variables like SECRET_KEY and DEBUG into an .env file
+    Create an .env file in the directory
+    Make key-value pairs for each variable
+        ex. SECRET_KEY='key'
+
+9. Install python-decouple to access .env variables
+    pip install python-decouple
+
+10. Import decouple to the settings.py file and change variables
+    from decouple import config
+
+    SECRET_KEY = config('SECRET_KEY')
+    DEBUG = config('DEBUG', cast=bool)
+
+PREPPING FOR DEPLOYMENT
+1. Make sure Git and the Heroku CLI is installed
+
+2. Go to the Heroku site and create a new app with a meaningful name
+
+3. Log into Heroku in the terminal
+    heroku login
+
+4. Attach heroku remote to repo
+    heroku git:remote -a <appname>
+    git remote --v (Checks the remote connections for the repo)
+
+5. Take the app url from Heroku and add it to ALLOWED_HOSTS in settings.py
+    ALLOWED_HOSTS = ['appname.herokuapp.com',]
+
+6. Add a buildpack to the app under the settings tab on the webpage (select Python)
+
+7. Deploy any changes to git
+
+DEPLOYMENT
+1. Go to the Deploy tab and select GitHub.
+
+2. Search for the desired repo
+
+3. Select Deploy Branch
+
+HEROKU NOTES
+- Finding the app log
+    heroku logs --tail
