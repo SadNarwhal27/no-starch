@@ -1,6 +1,10 @@
 """Transposition Cipher"""
 
-import math, random, sys
+import math
+import random
+import sys
+import time
+import os
 import pyperclip
 
 class TranspositionCipher:
@@ -56,7 +60,7 @@ class TranspositionCipher:
         plain_text = ''.join(plain_text)
         pyperclip.copy(plain_text)
         return plain_text
-    
+
 
     def test_transposition(self):
         """Automated testing for the transposition module"""
@@ -79,3 +83,42 @@ class TranspositionCipher:
                     sys.exit()
 
         print('Transposition cipher test passed.')
+
+
+    def file_cipher(self, input_file, output_file, key, encrypt=True):
+        """Encrypts and decrypts text files"""
+
+        # Quits the program if file does not exist
+        if not os.path.exists(input_file):
+            print(f"The file {input_file} does not exist. Quitting...")
+            sys.exit()
+
+        # Offers users a chance to quit if output file already exists
+        if os.path.exists(output_file):
+            print(f"This will overwrite the file {output_file}. (C)ontinue or (Q)uit?")
+            response = input('> ')
+            if not response.lower().startswith('c'):
+                sys.exit()
+
+        # Reads in file for crypting
+        file_obj = open(input_file)
+        content = file_obj.read()
+        file_obj.close()
+
+        print('Encrypting...' if encrypt else 'Decrypting...')
+
+        # Measures time elapsed while crypting
+        start_time = time.time()
+        if encrypt:
+            translated = self.encrypt_message(key, content)
+        else:
+            translated = self.decrypt_message(key, content)
+        total_time = round(time.time() - start_time, 2)
+        print(f'File ready. Time elapsed: {total_time}')
+
+        # Writes to output file
+        output_file_obj = open(output_file, 'w')
+        output_file_obj.write(translated)
+        output_file_obj.close()
+
+        print(f"# of characters changed: {len(content)}")
