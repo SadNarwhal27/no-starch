@@ -1,6 +1,7 @@
 """Contains the basic Caesar Cipher and brute-force solver"""
 
 import pyperclip
+from detect_language import DetectLanguage
 
 class CaesarCipher:
     """Uses the Caesar Cipher to make 1 to 1 translations"""
@@ -38,8 +39,11 @@ class CaesarCipher:
         return translated_message
 
 
-    def hack(self, message):
+    def hack_caesar(self, message):
         """Brute-force solve caesar ciphers"""
 
+        detector = DetectLanguage('Cracking Codes/dictionary.txt')
         for key in range(len(self.SYMBOLS)):
-            print(f"Key #{key}: {self.translate(message, key=key, encrypt=False)}")
+            temp_message = self.translate(message, key=key, encrypt=False)
+            if detector.is_coherent(temp_message):
+                return f"Key #{key}: {temp_message}"

@@ -6,6 +6,7 @@ import sys
 import time
 import os
 import pyperclip
+from detect_language import DetectLanguage
 
 class TranspositionCipher:
     """Transposition Cipher"""
@@ -122,3 +123,26 @@ class TranspositionCipher:
         output_file_obj.close()
 
         print(f"# of characters changed: {len(content)}")
+
+
+    def hack_transposition(self, message):
+        """Brute-force solve transposition ciphers"""
+
+        print('Hacking...')
+        detector = DetectLanguage('Cracking Codes/dictionary.txt')
+
+        for key in range(1, len(message)):
+            decrypted_text = self.decrypt_message(key, message)
+
+            if detector.is_coherent(decrypted_text):
+                print(f"\nPossible encryption hack:\nKey #{key}: {decrypted_text[:100]}\n"
+                      "(C)ontinue?")
+                response = input('> ').strip().upper()
+
+                if response.startswith('C'):
+                    pyperclip.copy(decrypted_text)
+                    print(f"Message copied to clipboard:\n\n{decrypted_text}")
+                    return decrypted_text
+
+        print('Decryption failed.')
+        return None
