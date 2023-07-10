@@ -12,7 +12,7 @@ class TranspositionCipher:
     """Transposition Cipher"""
 
     def __init__(self):
-        pass
+        """Initiates the Transposition Cipher class"""
 
 
     def encrypt_message(self, key, message):
